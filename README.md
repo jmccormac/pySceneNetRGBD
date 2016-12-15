@@ -29,11 +29,9 @@ The protobuf also stores instances for each trajectory, with each instance havin
 
 * Download the validation set (15GB) and the validation set protobuf file from the [SceneNet RGB-D project page](http://robotvault.bitbucket.org/scenenet-rgbd.html).
 
-* Extract the validation set, to a location on you local machine. To avoid editing more code, you can place it directly within the data directory of this repo data/val, or optionally place it somewhere else, and edit line 4 of the read_protobuf.py file to point towards the folder location.
+* Extract the validation set (```tar -xvzf val.tar.gz```), to a location on you local machine. To avoid editing more code, you can place it directly within the data directory of this repo data/val, or optionally place it somewhere else, and edit line 4 of the read_protobuf.py file to point towards the folder location.
 
-```
-tar -xvzf val.tar.gz
-```
+
 
 * This validation folder should contain a single folder 0, with 1,000 folders in it for each of the validation trajectories.
 
