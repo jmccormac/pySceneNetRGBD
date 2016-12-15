@@ -31,6 +31,10 @@ The protobuf also stores instances for each trajectory, with each instance havin
 
 * Extract the validation set, to a location on you local machine. To avoid editing more code, you can place it directly within the data directory of this repo data/val, or optionally place it somewhere else, and edit line 4 of the read_protobuf.py file to point towards the folder location.
 
+```
+tar -xvzf val.tar.gz
+```
+
 * This validation folder should contain a single folder 0, with 1,000 folders in it for each of the validation trajectories.
 
 * Copy the protobuf file to data folder of this repo.
