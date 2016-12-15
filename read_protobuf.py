@@ -1,8 +1,8 @@
 import scenenet_pb2 as sn
 import os
 
-data_root_path = 'data/val'
-protobuf_path = 'data/scenenet_rgbd_val.pb'
+data_root_path = '/home/dysondemo/workspace/code/SceneNetRGBD/val'
+protobuf_path = '/home/dysondemo/workspace/code/SceneNetRGBD/scenenet_rgbd_val.pb'
 
 # These functions produce a file path (on Linux systems) to the image given
 # a view and render path from a trajectory.  As long the data_root_path to the
@@ -23,13 +23,13 @@ def depth_path_from_view(render_path,view):
     return os.path.join(data_root_path,image_path)
 
 
-if __main__ == '__name__':
+if __name__ == '__main__':
     trajectories = sn.Trajectories()
     try:
         with open(protobuf_path,'rb') as f:
             trajectories.ParseFromString(f.read())
     except IOError:
-        print('Scenenet protobuf data not found at location:{0}'.format(file_path))
+        print('Scenenet protobuf data not found at location:{0}'.format(data_root_path))
         print('Please ensure you have copied the pb file to the data directory')
 
     print('Number of trajectories:{0}'.format(len(trajectories.trajectories)))

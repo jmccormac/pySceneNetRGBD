@@ -9,6 +9,10 @@ numpy
 PIL
 protobuf
 
+# protbuf installation
+
+Make sure you install protobuf with pip3 i.e. pip3 install protobuf
+
 # Dataset structure
 
 The dataset consists of two components.  The first component is a set of files organised into trajectory folders.  Each of these folders contains three directorys:
