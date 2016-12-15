@@ -1,12 +1,9 @@
-import scenenet_pb2 as sn
-import os
-
-import pathlib
 from PIL import Image
 import numpy as np
-
-
-MAX_NUM_INSTANCES = 150
+import os
+import pathlib
+import random
+import scenenet_pb2 as sn
 
 NYU_13_CLASSES = [(0,'Unknown'),
                   (1,'Bed'),
@@ -23,6 +20,7 @@ NYU_13_CLASSES = [(0,'Unknown'),
                   (12,'Wall'),
                   (13,'Window')
 ]
+
 NYU_WNID_TO_CLASS = {
     '04593077':4, '03262932':4, '02933112':6, '03207941':7, '03063968':10, '04398044':7, '04515003':7,
     '00017222':7, '02964075':10, '03246933':10, '03904060':10, '03018349':6, '03786621':4, '04225987':7,
@@ -63,28 +61,21 @@ NYU_WNID_TO_CLASS = {
     '02992529':7, '03222722':12, '04373704':4, '02851099':13, '04061681':10, '04529681':7,
 }
 
-
-data_root_path = '/home/dysondemo/workspace/code/SceneNetRGBD/val'
-protobuf_path = '/home/dysondemo/workspace/code/SceneNetRGBD/scenenet_rgbd_val.pb'
-
-# These functions produce a file path (on Linux systems) to the image given
-# a view and render path from a trajectory.  As long the data_root_path to the
-# root of the dataset is given.  I.e. to either val or train
-def photo_path_from_view(render_path,view):
-    photo_path = os.path.join(render_path,'photo')
-    image_path = os.path.join(photo_path,'{0}.jpg'.format(view.frame_num))
-    return os.path.join(data_root_path,image_path)
+data_root_path = '/mnt/disk2/final_dataset/val/'
+protobuf_path = 'data/scenenet_rgbd_val.pb'
 
 def instance_path_from_view(render_path,view):
     photo_path = os.path.join(render_path,'instance')
     image_path = os.path.join(photo_path,'{0}.png'.format(view.frame_num))
     return os.path.join(data_root_path,image_path)
 
-def depth_path_from_view(render_path,view):
-    photo_path = os.path.join(render_path,'instance')
-    image_path = os.path.join(photo_path,'{0}.png'.format(view.frame_num))
-    return os.path.join(data_root_path,image_path)
-
+def save_class_from_instance(instance_path,class_path,mapping):
+    instance_img = np.asarray(Image.open(instance_path))
+    class_img = np.zeros(instance_img.shape)
+    for instance, semantic_class in mapping.items():
+        class_img[instance_img == instance] = semantic_class
+    class_img = Image.fromarray(np.uint8(class_img))
+    class_img.save(class_path)
 
 if __name__ == '__main__':
     trajectories = sn.Trajectories()
@@ -95,56 +86,15 @@ if __name__ == '__main__':
         print('Scenenet protobuf data not found at location:{0}'.format(data_root_path))
         print('Please ensure you have copied the pb file to the data directory')
 
-    print('Number of trajectories:{0}'.format(len(trajectories.trajectories)))
-    for traj in trajectories.trajectories:
-        layout_type = sn.SceneLayout.LayoutType.Name(traj.layout.layout_type)
-        layout_path = traj.layout.model
-        '''
-        The instances attribute of trajectories contains all of the information
-        about the different instances.  The instance.instance_id attribute provides
-        correspondences with the rendered instance.png files.  I.e. for a given
-        trajectory, if a pixel is of value 1, the information about that instance,
-        such as its type, semantic class, and wordnet id, is stored here.
-        For more information about the exact information available refer to the
-        scenenet.proto file.
-        '''
-
-        wnid_lookup = NYU_WNID_TO_CLASS
-        instance_class_map = {}
-    
-        for instance in traj.instances:
-            instance_type = sn.Instance.InstanceType.Name(instance.instance_type)
-
-            class_id = instance.semantic_wordnet_id
-            
-            if instance.instance_type == sn.Instance.BACKGROUND:
-                continue
-            
-            if wnid_lookup is not None:
-                instance_class_map[int(instance.instance_id)] = wnid_lookup[class_id]
-            else:
-                instance_class_map[int(instance.instance_id)] = class_id
-
-        print('Render path:{0}'.format(traj.render_path))
-        '''
-        The views attribute of trajectories contains all of the information
-        about the rendered frames of a scene.  This includes camera poses,
-        frame numbers and timestamps.
-        '''
-        for view in traj.views:
-            instance_image = instance_path_from_view(traj.render_path,view)
-        
-            img = Image.open(str(instance_image))
-            img = np.asarray(img)
-            class_img = np.zeros(img.shape)
-            for instance, semanticclass in instance_class_map.items():
-                    class_img[img==instance] = semanticclass
-            class_img = Image.fromarray(np.uint8(class_img))
-            training_dir_str = os.path.join(traj.render_path)
-            class_image_path = str('semantic_classes/{0}_{1}_class.png'.format(training_dir_str,view.frame_num))
-            print(class_image_path)
-
-            #class_img.save(str(class_image_path))            
-            
-            print(view)
+    traj = random.choice(trajectories.trajectories)
+    instance_class_map = {}
+    for instance in traj.instances:
+        instance_type = sn.Instance.InstanceType.Name(instance.instance_type)
+        if instance.instance_type != sn.Instance.BACKGROUND:
+            instance_class_map[instance.instance_id] = NYU_WNID_TO_CLASS[instance.semantic_wordnet_id]
+    for view in traj.views:
+        instance_path = instance_path_from_view(traj.render_path,view)
+        print('Converting instance image:{0} to class image'.format(instance_path))
+        save_class_from_instance(instance_path,'semantic_class.png',instance_class_map)
+        print('Breaking early and writing class to semantic_class.png')
         break
