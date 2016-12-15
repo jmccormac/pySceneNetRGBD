@@ -47,5 +47,9 @@ python3 read_protobuf.py
     
 * You should see a print out of the information available for one of the trajectories within the dataset.
 
+# Example code for converting Instance to NYUv2 13 Semantic Classes
+
+* pending
+
 # License
 GPL. We would like to thank Dyson Technologies Limited for supporting this work.
