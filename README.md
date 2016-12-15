@@ -49,7 +49,9 @@ python3 read_protobuf.py
 
 # Example code for converting Instance to NYUv2 13 Semantic Classes
 
-* pending
+* Run the convert_instance2class.py to map a random instance image taken from a dataset to its corresponding 13 class semantic image.
+
+* These 13 semantic categories are as given in NYUv2. 
 
 # License
 GPL. We would like to thank Dyson Technologies Limited for supporting this work.
