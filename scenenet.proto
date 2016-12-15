@@ -11,6 +11,7 @@ message SceneLayout {
         OFFICE = 5;
     }
     optional LayoutType layout_type = 1;
+    // This is the name of the SceneNet model used for the layout
     optional string model = 2;
 }
 
@@ -53,9 +54,17 @@ message Instance {
     optional string semantic_wordnet_id = 2;
     optional string semantic_english = 3;
     enum InstanceType {
+        // This is the instance type when no object is present, e.g. because of
+        // looking out a window into nothingness
         BACKGROUND = 1;
+        // This is an object that is hard coded into the layout and does not
+        // move.  This type does not have a transformation or shapenet hash
         LAYOUT_OBJECT = 2;
+        // This is a randomly positioned light source
         LIGHT_OBJECT = 3;
+        // This means the object is a randomly positioned shapenet object. The
+        // object has a transformation and scale parameter in the object_info
+        // variable.
         RANDOM_OBJECT = 4;
     }
     optional InstanceType instance_type = 4;
@@ -95,9 +104,14 @@ message Trajectory {
     repeated Instance instances = 2;
     // These are ordered sequentially for a trajectory
     repeated View views = 3;
+    // This stores the path from the root data directory to the trajectory data
+    // folder.  If the trajectories are stored as:
+    // /path/i/extracted/{val/train}/0/123/photo/0.jpg 
+    // then this path will be '0/123' designating the trajectories folder
     optional string render_path = 4;
 }
 
 message Trajectories {
+    // This is the root list which stores all of the available trajectories
     repeated Trajectory trajectories = 1;
 }

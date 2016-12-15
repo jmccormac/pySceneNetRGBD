@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+scenenet_pb2.py
 
 # C extensions
 *.so
