@@ -23,13 +23,13 @@ def depth_path_from_view(render_path,view):
     return os.path.join(data_root_path,image_path)
 
 
-if __main__ == '__name__':
+if __name__ == '__main__':
     trajectories = sn.Trajectories()
     try:
         with open(protobuf_path,'rb') as f:
             trajectories.ParseFromString(f.read())
     except IOError:
-        print('Scenenet protobuf data not found at location:{0}'.format(file_path))
+        print('Scenenet protobuf data not found at location:{0}'.format(data_root_path))
         print('Please ensure you have copied the pb file to the data directory')
 
     print('Number of trajectories:{0}'.format(len(trajectories.trajectories)))
