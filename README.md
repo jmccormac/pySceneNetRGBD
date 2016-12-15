@@ -4,10 +4,10 @@ A set of python3 scripts showing examples of how to navigate and access the core
 
 # Requirements
 
-python3
-numpy
-PIL
-protobuf
+* python3
+* numpy
+* PIL
+* protobuf
 
 # Dataset structure
 
