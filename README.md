@@ -39,7 +39,9 @@ The protobuf also stores instances for each trajectory, with each instance havin
 
 * Run the read_protobuf.py to print out information about a single trajectory (remove the final break to print our information about them all)
 
-    python3 read_protobuf.py
+```
+python3 read_protobuf.py
+```
     
 * You should see a print out of the information available for one of the trajectories within the dataset.
 
