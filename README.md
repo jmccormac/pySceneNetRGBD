@@ -68,7 +68,7 @@ imagesc(I)
 ```
 One of our sample 'semantic_class.png' image looks like 
 
-<img src="readme_images/test.png" align="left" width="320" ><br><br>
+<img src="readme_images/test.png" align="left" width="320" ><br><br><br><br><br><br>
 
 # License
 GPL. We would like to thank Dyson Technologies Limited for supporting this work.
