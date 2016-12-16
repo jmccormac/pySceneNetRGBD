@@ -11,7 +11,11 @@ A set of python3 scripts showing examples of how to navigate and access the core
 
 # protbuf installation
 
-Make sure you install protobuf with pip3 i.e. pip3 install protobuf
+Make sure you install protobuf with pip3 
+
+```
+pip3 install protobuf
+```
 
 # Dataset structure
 
