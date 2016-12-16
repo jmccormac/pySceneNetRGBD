@@ -64,7 +64,7 @@ imagesc(I)
 ```
 One of our sample 'semantic_class.png' image looks like 
 
-![image](readme_images/semantic_class.png "Image")
+![image](readme_images/test.png "Image")
 
 # License
 GPL. We would like to thank Dyson Technologies Limited for supporting this work.
