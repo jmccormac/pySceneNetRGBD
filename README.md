@@ -53,5 +53,18 @@ python3 read_protobuf.py
 
 * These 13 semantic categories are as given in NYUv2. 
 
+* The code will take some time but it will write an image 'semantic_class.png' in the same directory where each pixel has an index value encoding the semantic category.
+
+* If you use MATLAB or octave, you can view the image with following commands 
+
+```
+I = imread('semantic_class.png')
+
+imagesc(I)
+```
+One of our sample 'semantic_class.png' image looks like 
+
+![image](readme_images/semantic_class.png "Image")
+
 # License
 GPL. We would like to thank Dyson Technologies Limited for supporting this work.
