@@ -66,6 +66,9 @@ I = imread('semantic_class.png')
 
 imagesc(I)
 ```
+* Additionally it writes another file called 'NYUv2.png' where each category is colour coded as Some Markdown text with <span style="color:blue">some *blue* text</span>.
+
+
 One of our sample 'semantic_class.png' image looks like 
 
 <img src="readme_images/test.png" align="left" width="320" ><br><br><br><br><br><br><br><br><br><br>
