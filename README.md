@@ -66,7 +66,7 @@ I = imread('semantic_class.png')
 
 imagesc(I)
 ```
-* Additionally it writes another file called 'NYUv2.png' where each category is colour coded as Some Markdown text with <span style="color:blue">some *blue* text</span>.
+* Additionally it writes another file called 'NYUv2.png' where each category is colour coded as in SceneNet
 
 
 One of our sample 'semantic_class.png' image looks like 
