@@ -21,6 +21,21 @@ NYU_13_CLASSES = [(0,'Unknown'),
                   (13,'Window')
 ]
 
+colour_code = np.array([[0, 0, 0],
+                       [0, 0, 1],
+                       [0.9137,0.3490,0.1882], #BOOKS
+                       [0, 0.8549, 0], #CEILING
+                       [0.5843,0,0.9412], #CHAIR
+                       [0.8706,0.9451,0.0941], #FLOOR
+                       [1.0000,0.8078,0.8078], #FURNITURE
+                       [0,0.8784,0.8980], #OBJECTS
+                       [0.4157,0.5333,0.8000], #PAINTING
+                       [0.4588,0.1137,0.1608], #SOFA
+                       [0.9412,0.1373,0.9216], #TABLE
+                       [0,0.6549,0.6118], #TV
+                       [0.9765,0.5451,0], #WALL
+                       [0.8824,0.8980,0.7608]])
+
 NYU_WNID_TO_CLASS = {
     '04593077':4, '03262932':4, '02933112':6, '03207941':7, '03063968':10, '04398044':7, '04515003':7,
     '00017222':7, '02964075':10, '03246933':10, '03904060':10, '03018349':6, '03786621':4, '04225987':7,
@@ -61,24 +76,38 @@ NYU_WNID_TO_CLASS = {
     '02992529':7, '03222722':12, '04373704':4, '02851099':13, '04061681':10, '04529681':7,
 }
 
-#data_root_path = '/mnt/disk2/final_dataset/val/'
-#protobuf_path = 'data/scenenet_rgbd_val.pb'
-
-data_root_path = '/home/dysondemo/workspace/code/SceneNetRGBD/val/'
-protobuf_path = '/home/dysondemo/workspace/code/SceneNetRGBD/scenenet_rgbd_val.pb'
+data_root_path = '/mnt/disk2/final_dataset/val/'
+protobuf_path = 'data/scenenet_rgbd_val.pb'
 
 def instance_path_from_view(render_path,view):
     photo_path = os.path.join(render_path,'instance')
     image_path = os.path.join(photo_path,'{0}.png'.format(view.frame_num))
     return os.path.join(data_root_path,image_path)
 
-def save_class_from_instance(instance_path,class_path,mapping):
+def save_class_from_instance(instance_path,class_path, class_NYUv2_colourcode_path, mapping):
     instance_img = np.asarray(Image.open(instance_path))
     class_img = np.zeros(instance_img.shape)
+    h,w  = instance_img.shape
+
+    class_img_rgb = np.zeros((h,w,3),dtype=np.uint8)    
+    r = class_img_rgb[:,:,0]
+    g = class_img_rgb[:,:,1]
+    b = class_img_rgb[:,:,2]    
+    
     for instance, semantic_class in mapping.items():
         class_img[instance_img == instance] = semantic_class
+        r[instance_img==instance] = np.uint8(colour_code[semantic_class][0]*255)
+        g[instance_img==instance] = np.uint8(colour_code[semantic_class][1]*255)
+        b[instance_img==instance] = np.uint8(colour_code[semantic_class][2]*255)
+        
+    class_img_rgb[:,:,0] = r
+    class_img_rgb[:,:,1] = g
+    class_img_rgb[:,:,2] = b
+        
     class_img = Image.fromarray(np.uint8(class_img))
+    class_img_rgb = Image.fromarray(class_img_rgb)
     class_img.save(class_path)
+    class_img_rgb.save(class_NYUv2_colourcode_path)
 
 if __name__ == '__main__':
     trajectories = sn.Trajectories()
@@ -98,6 +127,6 @@ if __name__ == '__main__':
     for view in traj.views:
         instance_path = instance_path_from_view(traj.render_path,view)
         print('Converting instance image:{0} to class image'.format(instance_path))
-        save_class_from_instance(instance_path,'semantic_class.png',instance_class_map)
+        save_class_from_instance(instance_path,'semantic_class.png','NYUv2.png',instance_class_map)
         print('Breaking early and writing class to semantic_class.png')
         break
