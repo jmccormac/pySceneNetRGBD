@@ -85,42 +85,6 @@ Plain english name:chandelier
 --------------------
 
 ====================
-Instance id:3
-Instance type:LAYOUT_OBJECT
-Wordnet id:03365592
-Plain english name:floor
---------------------
-
-====================
-Instance id:4
-Instance type:LAYOUT_OBJECT
-Wordnet id:03876519
-Plain english name:painting
---------------------
-
-====================
-Instance id:5
-Instance type:LAYOUT_OBJECT
-Wordnet id:04546855
-Plain english name:wall
---------------------
-
-====================
-Instance id:6
-Instance type:LAYOUT_OBJECT
-Wordnet id:04546855
-Plain english name:wall
---------------------
-
-====================
-Instance id:7
-Instance type:LIGHT_OBJECT
-Wordnet id:03665924
-Plain english name:lightbulb
-Light type:PARALLELOGRAM
---------------------
-
-====================
 Instance id:8
 Instance type:LIGHT_OBJECT
 Wordnet id:03665924
