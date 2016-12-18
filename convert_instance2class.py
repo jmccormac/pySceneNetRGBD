@@ -76,8 +76,12 @@ NYU_WNID_TO_CLASS = {
     '02992529':7, '03222722':12, '04373704':4, '02851099':13, '04061681':10, '04529681':7,
 }
 
-data_root_path = '/mnt/disk2/final_dataset/val/'
-protobuf_path = 'data/scenenet_rgbd_val.pb'
+#data_root_path = '/mnt/disk2/final_dataset/val/'
+#protobuf_path = 'data/scenenet_rgbd_val.pb'
+
+data_root_path = '/home/dysondemo/workspace/code/SceneNetRGBD/val/'
+protobuf_path = '/home/dysondemo/workspace/code/SceneNetRGBD/scenenet_rgbd_val.pb'
+
 
 def instance_path_from_view(render_path,view):
     photo_path = os.path.join(render_path,'instance')
