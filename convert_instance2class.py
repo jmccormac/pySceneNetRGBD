@@ -76,12 +76,8 @@ NYU_WNID_TO_CLASS = {
     '02992529':7, '03222722':12, '04373704':4, '02851099':13, '04061681':10, '04529681':7,
 }
 
-#data_root_path = '/mnt/disk2/final_dataset/val/'
-#protobuf_path = 'data/scenenet_rgbd_val.pb'
-
-data_root_path = '/home/dysondemo/workspace/code/SceneNetRGBD/val/'
-protobuf_path = '/home/dysondemo/workspace/code/SceneNetRGBD/scenenet_rgbd_val.pb'
-
+data_root_path = 'data/val'
+protobuf_path = 'data/scenenet_rgbd_val.pb'
 
 def instance_path_from_view(render_path,view):
     photo_path = os.path.join(render_path,'instance')
@@ -93,21 +89,21 @@ def save_class_from_instance(instance_path,class_path, class_NYUv2_colourcode_pa
     class_img = np.zeros(instance_img.shape)
     h,w  = instance_img.shape
 
-    class_img_rgb = np.zeros((h,w,3),dtype=np.uint8)    
+    class_img_rgb = np.zeros((h,w,3),dtype=np.uint8)
     r = class_img_rgb[:,:,0]
     g = class_img_rgb[:,:,1]
-    b = class_img_rgb[:,:,2]    
-    
+    b = class_img_rgb[:,:,2]
+
     for instance, semantic_class in mapping.items():
         class_img[instance_img == instance] = semantic_class
         r[instance_img==instance] = np.uint8(colour_code[semantic_class][0]*255)
         g[instance_img==instance] = np.uint8(colour_code[semantic_class][1]*255)
         b[instance_img==instance] = np.uint8(colour_code[semantic_class][2]*255)
-        
+
     class_img_rgb[:,:,0] = r
     class_img_rgb[:,:,1] = g
     class_img_rgb[:,:,2] = b
-        
+
     class_img = Image.fromarray(np.uint8(class_img))
     class_img_rgb = Image.fromarray(class_img_rgb)
     class_img.save(class_path)
