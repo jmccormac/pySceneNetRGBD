@@ -19,7 +19,6 @@ def load_depth_map_in_m(file_name):
 
 def pixel_to_ray(pixel,vfov=45,hfov=60,pixel_width=320,pixel_height=240):
     x, y = pixel
-    y = pixel_height - y - 1
     x_vect = math.tan(math.radians(hfov/2.0)) * ((2.0 * ((x+0.5)/pixel_width)) - 1.0)
     y_vect = math.tan(math.radians(vfov/2.0)) * ((2.0 * ((y+0.5)/pixel_height)) - 1.0)
     return (x_vect,y_vect,1.0)
@@ -62,7 +61,7 @@ def world_to_camera_with_pose(view_pose):
     R = np.diag(np.ones(4))
     R[2,:3] = normalize(lookat_pose - camera_pose)
     R[0,:3] = normalize(np.cross(R[2,:3],up))
-    R[1,:3] = normalize(np.cross(R[0,:3],R[2,:3]))
+    R[1,:3] = -normalize(np.cross(R[0,:3],R[2,:3]))
     T = np.diag(np.ones(4))
     T[:3,3] = -camera_pose
     return R.dot(T)
@@ -73,7 +72,7 @@ def camera_to_world_with_pose(view_pose):
 def camera_point_to_uv_pixel_location(point,vfov=45,hfov=60,pixel_width=320,pixel_height=240):
     point = point / point[2]
     u = ((pixel_width/2.0) * ((point[0]/math.tan(math.radians(hfov/2.0))) + 1))
-    v = pixel_height - ((pixel_height/2.0) * ((point[1]/math.tan(math.radians(vfov/2.0))) + 1))
+    v = ((pixel_height/2.0) * ((point[1]/math.tan(math.radians(vfov/2.0))) + 1))
     return (u,v)
 
 def position_to_np_array(position):
@@ -123,7 +122,7 @@ def optical_flow(points,shutter_open,shutter_close,alpha=0.5,shutter_time=(1.0/6
 
     # Get camera pixel scale constants
     uk = (pixel_width/2.0) * ((1.0/math.tan(math.radians(hfov/2.0))))
-    vk = -(pixel_height/2.0) * ((1.0/math.tan(math.radians(vfov/2.0))))
+    vk = (pixel_height/2.0) * ((1.0/math.tan(math.radians(vfov/2.0))))
 
     # Get basis vectors
     ub1 = lookat_pose - camera_pose
@@ -131,7 +130,7 @@ def optical_flow(points,shutter_open,shutter_close,alpha=0.5,shutter_time=(1.0/6
     ub2 = np.cross(b1,np.array([0,1,0]))
     b2 = normalize(ub2)
     ub3 = np.cross(b2,b1)
-    b3 = normalize(ub3)
+    b3 = -normalize(ub3)
 
     # Get camera pose alpha derivative
     camera_end = position_to_np_array(shutter_close.camera)
@@ -154,7 +153,7 @@ def optical_flow(points,shutter_open,shutter_close,alpha=0.5,shutter_time=(1.0/6
             -(db2_dalpha[0]*b1[2] + db1_dalpha[2]*b2[0])+(db2_dalpha[2]*b1[0]+db1_dalpha[0]*b2[2]),
             (db1_dalpha[1]*b2[0]+db2_dalpha[0]*b1[1])
         ])
-    db3_dalpha = db3_dub3.dot(dub3_dalpha)
+    db3_dalpha = -db3_dub3.dot(dub3_dalpha)
 
     # derivative of the rotated translation offset
     dt3_dalpha = np.array([
