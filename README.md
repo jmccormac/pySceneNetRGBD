@@ -9,7 +9,7 @@ A set of python3 scripts showing examples of how to navigate and access the core
 * PIL
 * protobuf
 
-# protbuf installation
+# protobuf installation
 
 Make sure you install protobuf with pip3 
 
