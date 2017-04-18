@@ -21,6 +21,15 @@ message LightInfo {
         PARALLELOGRAM = 2;
     }
     optional LightType light_type = 1;
+    // Light intensity
+    optional Power light_output = 2;
+    // This is the center for sphere type lights. And corner for others
+    optional Position position = 3;
+    // This is only for SPHERE lights
+    optional float radius = 4;
+    // This is only for PARALLELOGRAM lights
+    optional Position v1 = 5;
+    optional Position v2 = 6;
 }
 
 message RandomObjectInfo {
@@ -71,6 +80,12 @@ message Instance {
     // This information is only filled in for the respective type
     optional LightInfo light_info = 5;
     optional RandomObjectInfo object_info = 6;
+}
+
+message Power {
+    optional float r = 1;
+    optional float g = 2;
+    optional float b = 3;
 }
 
 message Position {

@@ -34,8 +34,10 @@ def camera_intrinsic_transform(vfov=45,hfov=60,pixel_width=320,pixel_height=240)
     camera_intrinsics[1,2] = pixel_height/2.0
     return camera_intrinsics
 
-def position_to_np_array(position):
-    return np.array([position.x,position.y,position.z])
+def position_to_np_array(position,homogenous=False):
+    if not homogenous:
+        return np.array([position.x,position.y,position.z])
+    return np.array([position.x,position.y,position.z,1.0])
 
 def interpolate_poses(start_pose,end_pose,alpha):
     assert alpha >= 0.0
@@ -73,13 +75,12 @@ if __name__ == '__main__':
         print('Please ensure you have copied the pb file to the data directory')
 
 
-    for idx,a_traj in enumerate(trajectories.trajectories):
-        if a_traj.render_path == '0/68':
-            traj = a_traj
-            break
-    # This is the 3D position of the center of the spherical light in 
-    # the validation trajectory '0/68' in world coordinates
-    light_position = np.array([-2.02838,1.57111,-0.388005,1.0])
+    traj = random.choice(trajectories.trajectories)
+    # Get positions of all the lights in the scene
+    light_positions = []
+    for instance in traj.instances:
+        if instance.instance_type == sn.Instance.LIGHT_OBJECT:
+            light_positions.append(position_to_np_array(instance.light_info.position,homogenous=True))
     intrinsic_matrix = camera_intrinsic_transform()
     print('Instrinsic Camera Matrix')
     print(intrinsic_matrix)
@@ -87,24 +88,27 @@ if __name__ == '__main__':
         # Get camera pose
         ground_truth_pose = interpolate_poses(view.shutter_open,view.shutter_close,0.5)
         world_to_camera_matrix = world_to_camera_with_pose(ground_truth_pose)
-         # Get light center in camera coordinates
-        light_position_in_camera_coordinates = world_to_camera_matrix.dot(light_position)
-         # Use camera intrinsics to project light center to pixel position
-        uv_projection = intrinsic_matrix.dot(light_position_in_camera_coordinates)
-        uv_projection /= uv_projection[2]
-        # Augment the photo image with a black cross over the light in all frames 
-        # in which it's visible
-        pixel_x_position = int(uv_projection[0])
-        pixel_y_position = int(uv_projection[1])
-        photo_path = photo_path_from_view(traj.render_path,view)
-        img = Image.open(photo_path)
-        if pixel_x_position > 0 and pixel_x_position < 319:
-            if pixel_y_position > 0 and pixel_y_position < 239:
-                array = np.array(img)
-                array[pixel_y_position,pixel_x_position,:] = 0.0
-                array[pixel_y_position-1,pixel_x_position,:] = 0.0
-                array[pixel_y_position+1,pixel_x_position,:] = 0.0
-                array[pixel_y_position,pixel_x_position-1,:] = 0.0
-                array[pixel_y_position,pixel_x_position+1,:] = 0.0
-                img = Image.fromarray(np.uint8(array))
+        # Mark all light positions projected in the camera with a cross
+        for light_position in light_positions:
+            # Get light center in camera coordinates
+            light_position_in_camera_coordinates = world_to_camera_matrix.dot(light_position)
+            # Use camera intrinsics to project light center to pixel position
+            uv_projection = intrinsic_matrix.dot(light_position_in_camera_coordinates)
+            uv_projection /= uv_projection[2]
+            # Augment the photo image with a black cross over the light in all frames
+            # in which it's visible
+            pixel_x_position = int(uv_projection[0])
+            pixel_y_position = int(uv_projection[1])
+            photo_path = photo_path_from_view(traj.render_path,view)
+            img = Image.open(photo_path)
+            # Draw black cross here
+            if pixel_x_position > 0 and pixel_x_position < 319:
+                if pixel_y_position > 0 and pixel_y_position < 239:
+                    array = np.array(img)
+                    array[pixel_y_position,pixel_x_position,:] = 0.0
+                    array[pixel_y_position-1,pixel_x_position,:] = 0.0
+                    array[pixel_y_position+1,pixel_x_position,:] = 0.0
+                    array[pixel_y_position,pixel_x_position-1,:] = 0.0
+                    array[pixel_y_position,pixel_x_position+1,:] = 0.0
+                    img = Image.fromarray(np.uint8(array))
         img.save('{0}_marking_light.jpg'.format(idx))
