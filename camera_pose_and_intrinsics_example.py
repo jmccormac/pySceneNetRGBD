@@ -88,6 +88,10 @@ if __name__ == '__main__':
         # Get camera pose
         ground_truth_pose = interpolate_poses(view.shutter_open,view.shutter_close,0.5)
         world_to_camera_matrix = world_to_camera_with_pose(ground_truth_pose)
+        # Open the photo
+        photo_path = photo_path_from_view(traj.render_path,view)
+        img = Image.open(photo_path)
+        array = np.array(img)
         # Mark all light positions projected in the camera with a cross
         for light_position in light_positions:
             # Get light center in camera coordinates
@@ -99,12 +103,9 @@ if __name__ == '__main__':
             # in which it's visible
             pixel_x_position = int(uv_projection[0])
             pixel_y_position = int(uv_projection[1])
-            photo_path = photo_path_from_view(traj.render_path,view)
-            img = Image.open(photo_path)
             # Draw black cross here
             if pixel_x_position > 0 and pixel_x_position < 319:
                 if pixel_y_position > 0 and pixel_y_position < 239:
-                    array = np.array(img)
                     array[pixel_y_position,pixel_x_position,:] = 0.0
                     array[pixel_y_position-1,pixel_x_position,:] = 0.0
                     array[pixel_y_position+1,pixel_x_position,:] = 0.0
