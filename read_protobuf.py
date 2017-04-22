@@ -18,7 +18,7 @@ def instance_path_from_view(render_path,view):
     return os.path.join(data_root_path,image_path)
 
 def depth_path_from_view(render_path,view):
-    photo_path = os.path.join(render_path,'instance')
+    photo_path = os.path.join(render_path,'depth')
     image_path = os.path.join(photo_path,'{0}.png'.format(view.frame_num))
     return os.path.join(data_root_path,image_path)
 

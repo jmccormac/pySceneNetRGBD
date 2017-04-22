@@ -9,7 +9,7 @@ A set of python3 scripts showing examples of how to navigate and access the core
 * PIL
 * protobuf
 
-# protbuf installation
+# protobuf installation
 
 Make sure you install protobuf with pip3 
 
@@ -31,7 +31,7 @@ The protobuf also stores instances for each trajectory, with each instance havin
 
 # How to get started with the validation set
 
-* Download the validation set (15GB) and the validation set protobuf file from the [SceneNet RGB-D project page](http://robotvault.bitbucket.org/scenenet-rgbd.html).
+* Download the validation set (15GB) and the validation set protobuf file from the [SceneNet RGB-D project page](http://robotvault.bitbucket.io/scenenet-rgbd.html).
 
 * Extract the validation set (```tar -xvzf val.tar.gz```), to a location on you local machine. To avoid editing more code, you can place it directly within the data directory of this repo data/val, or optionally place it somewhere else, and edit line 4 of the read_protobuf.py file to point towards the folder location.
 
