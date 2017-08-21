@@ -251,11 +251,12 @@ One of our sample 'semantic_class.png' image looks like
 
 <img src="readme_images/test.png" align="left" width="320" ><br><br><br><br><br><br><br><br><br><br>
 
-```
 
 # Notes
 
 There was a typo in the original paper stating that the vertical Field of View of the camera used for the dataset was 40 degrees, but it is in fact 45 degrees. The code in this repository and camera intrinsic matrix provided use the correct 45 degree vFoV.
+
+```
 
 # License
 GPL. We would like to thank Dyson Technologies Limited for supporting this work.
