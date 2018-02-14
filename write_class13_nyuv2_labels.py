@@ -187,7 +187,7 @@ if __name__ == '__main__':
 
             instance_path_splits = instance_path.split('/')
 
-            print(instance_path_splits)
+            print(instance_path_splits[2], instance_path_splits[3])
 
             # class_path = 'data/val/class13/' + 'semantic_class13_{:d}_{:d}_{:d}.png'.format(pb_num, dir_num,view.frame_num)
             # class_NYUv2_colourcode_path = instance_path.replace('instance', 'class13colour')
