@@ -181,9 +181,12 @@ if __name__ == '__main__':
             dir_num = instance_path_splits[3]
 
             class_path = data_root_path + '/class13/semantic_class13_{0}_{1}_{2}.png'.format(pb_num, dir_num,view.frame_num)
+            print(class_path)
             class_NYUv2_colourcode_path = class_path.replace('class13', 'class13colour')
 
             save_class_from_instance(instance_path_from_view(traj.render_path,view),
                                      class_path,
                                      class_NYUv2_colourcode_path,
                                      instance_class_map)
+
+            break
