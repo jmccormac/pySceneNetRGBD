@@ -177,6 +177,8 @@ if __name__ == '__main__':
 
             instance_path_splits = instance_path.split('/')
 
+            print(instance_path_splits)
+
             pb_num = instance_path_splits[2]
             dir_num = instance_path_splits[3]
 
