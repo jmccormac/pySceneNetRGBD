@@ -3,8 +3,8 @@ import os
 import numpy as np
 from PIL import Image
 
-data_root_path = 'data/val'
-protobuf_path = 'data/scenenet_rgbd_val.pb'
+data_root_path = '/se3netsproject/val'
+protobuf_path = '/se3netsproject/scenenet_rgbd_val.pb'
 
 NYU_13_CLASSES = [(0,'Unknown'),
                   (1,'Bed'),
@@ -142,14 +142,6 @@ if __name__ == '__main__':
             if instance.instance_type != sn.Instance.BACKGROUND:
                 instance_class_map[instance.instance_id] = NYU_WNID_TO_CLASS[instance.semantic_wordnet_id]
 
-        # layout_type = sn.SceneLayout.LayoutType.Name(traj.layout.layout_type)
-        # layout_path = traj.layout.model
-        # print('='*20)
-        # print('Render path:{0}'.format(traj.render_path))
-        # print('Layout type:{0} path:{1}'.format(layout_type,layout_path))
-        # print('='*20)
-        # print('')
-        # print('Number of instances: {0}'.format(len(traj.instances)))
         '''
         The instances attribute of trajectories contains all of the information
         about the different instances.  The instance.instance_id attribute provides
@@ -159,27 +151,13 @@ if __name__ == '__main__':
         For more information about the exact information available refer to the
         scenenet.proto file.
         '''
-        # for instance in traj.instances:
-        #     instance_type = sn.Instance.InstanceType.Name(instance.instance_type)
-        #     print('='*20)
-        #     print('Instance id:{0}'.format(instance.instance_id))
-        #     print('Instance type:{0}'.format(instance_type))
-        #     if instance.instance_type != sn.Instance.BACKGROUND:
-        #         print('Wordnet id:{0}'.format(instance.semantic_wordnet_id))
-        #         print('Plain english name:{0}'.format(instance.semantic_english))
-        #     if instance.instance_type == sn.Instance.LIGHT_OBJECT:
-        #         light_type = sn.LightInfo.LightType.Name(instance.light_info.light_type)
-        #         print('Light type:{0}'.format(light_type))
-        #     if instance.instance_type == sn.Instance.RANDOM_OBJECT:
-        #         print('Object info:{0}'.format(instance.object_info))
-        #     print('-'*20)
-        #     print('')
-        # print('Render path:{0}'.format(traj.render_path))
+
         '''
         The views attribute of trajectories contains all of the information
         about the rendered frames of a scene.  This includes camera poses,
         frame numbers and timestamps.
         '''
+
         for view in traj.views:
             print(photo_path_from_view(traj.render_path,view))
 
@@ -190,16 +168,10 @@ if __name__ == '__main__':
             pb_num = instance_path_splits[2]
             dir_num = instance_path_splits[3]
 
-            class_path = 'data/val/class13/' + 'semantic_class13_{0}_{1}_{2}.png'.format(pb_num, dir_num,view.frame_num)
-            print(class_path)
+            class_path = data_root_path + '/class13/semantic_class13_{0}_{1}_{2}.png'.format(pb_num, dir_num,view.frame_num)
             class_NYUv2_colourcode_path = class_path.replace('class13', 'class13colour')
 
             save_class_from_instance(instance_path_from_view(traj.render_path,view),
                                      class_path,
                                      class_NYUv2_colourcode_path,
                                      instance_class_map)
-
-            # print(depth_path_from_view(traj.render_path,view))
-            # print(instance_path_from_view(traj.render_path,view))
-            # print(view)
-        break
