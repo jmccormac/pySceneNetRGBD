@@ -171,6 +171,7 @@ if __name__ == '__main__':
         '''
 
         for view in traj.views:
+            print(protobuf_path)
             print(photo_path_from_view(traj.render_path,view))
 
             instance_path = instance_path_from_view(traj.render_path,view)
