@@ -3,8 +3,7 @@ import os
 import numpy as np
 from PIL import Image
 
-data_root_path = '/se3netsproject/val'
-protobuf_path = '/se3netsproject/scenenet_rgbd_val.pb'
+import argparse
 
 NYU_13_CLASSES = [(0,'Unknown'),
                   (1,'Bed'),
@@ -125,6 +124,19 @@ def save_class_from_instance(instance_path,
 
 
 if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("data_root_path", type=str, default='/se3netsproject/val',
+                        help="root folder where the data lies")
+
+    parser.add_argument("protobuf_path", type=str, default='/se3netsproject/scenenet_rgbd_val.pb',
+                        help="increase output verbosity")
+
+    args = parser.parse_args()
+
+    data_root_path = args.data_root_path
+    protobuf_path  = args.protobuf_path
+
     trajectories = sn.Trajectories()
     try:
         with open(protobuf_path,'rb') as f:
