@@ -179,8 +179,8 @@ if __name__ == '__main__':
 
             print(instance_path_splits)
 
-            pb_num = instance_path_splits[2]
-            dir_num = instance_path_splits[3]
+            pb_num = instance_path_splits[3]
+            dir_num = instance_path_splits[4]
 
             class_path = data_root_path + '/class13/semantic_class13_{0}_{1}_{2}.png'.format(pb_num, dir_num,view.frame_num)
             print(class_path)
