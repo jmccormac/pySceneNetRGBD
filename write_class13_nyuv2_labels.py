@@ -184,13 +184,18 @@ if __name__ == '__main__':
             print(photo_path_from_view(traj.render_path,view))
 
             instance_path = instance_path_from_view(traj.render_path,view)
-            class_path = instance_path.replace('instance','class13')
-            class_NYUv2_colourcode_path = instance_path.replace('instance', 'class13colour')
 
-            save_class_from_instance(instance_path_from_view(traj.render_path,view),
-                                     class_path,
-                                     class_NYUv2_colourcode_path,
-                                     instance_class_map)
+            instance_path_splits = instance_path.split('/')
+
+            print(instance_path_splits)
+
+            # class_path = 'data/val/class13/' + 'semantic_class13_{:d}_{:d}_{:d}.png'.format(pb_num, dir_num,view.frame_num)
+            # class_NYUv2_colourcode_path = instance_path.replace('instance', 'class13colour')
+
+            # save_class_from_instance(instance_path_from_view(traj.render_path,view),
+            #                          class_path,
+            #                          class_NYUv2_colourcode_path,
+            #                          instance_class_map)
 
             # print(depth_path_from_view(traj.render_path,view))
             # print(instance_path_from_view(traj.render_path,view))
