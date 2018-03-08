@@ -94,6 +94,11 @@ if __name__ == '__main__':
                     y = float(s[1])
                     z = float(s[2])
                     p = numpy.array([x,y,z])
+
+                    tmp = p[0]
+                    p[0] = p[2]
+                    p[2] = -tmp
+
                     p = (p - centroid) * (height / (bb[3] - bb[2]))
                     p = R.dot(p) + T
                     output_file.write('v %f %f %f\n' % (p[0],p[1],p[2]))
