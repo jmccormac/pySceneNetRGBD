@@ -52,16 +52,19 @@ if __name__ == '__main__':
     output_file = open(output_path,'w')
     offset_vertex = 0
     offset_texture = 0
+    offset_normals = 0
     print('Producing scene layout obj for render path:{0} outputting to:{1}'.format(traj.render_path,output_path))
     # Write out the layout obj file
     for l in layout_file:
         if l.startswith('v '):
             offset_vertex += 1
+        elif l.startswith('vn '):
+            offset_normals += 1
         elif l.startswith('vt '):
             offset_texture += 1
         output_file.write(l)
     layout_file.close()
-    for instance in traj.instances:
+    for k, instance in enumerate(traj.instances):
         # Add the instance object obj mesh to the combined scene
         if instance.instance_type == sn.Instance.RANDOM_OBJECT:
             shapenet_id = instance.object_info.shapenet_hash
@@ -84,11 +87,13 @@ if __name__ == '__main__':
             centroid = numpy.array([bb[0]+((bb[1]-bb[0])/2.0),bb[2]+((bb[3]-bb[2])/2.0),bb[4]+((bb[5]-bb[4])/2.0)])
             centroid[1] -= 0.6 * (bb[3] - bb[2])
             shapenet_file = open(shapenet_model_path,'r')
-            num_vertices = 0
-            num_texture = 0
+            num_v = 0
+            num_vt = 0
+            num_vn = 0
+            output_file.write('o rand_obj.%d\n' % k)
             for l in shapenet_file:
                 if l.startswith('v '):
-                    num_vertices += 1
+                    num_v += 1
                     s = l[2:].split()
                     x = float(s[0])
                     y = float(s[1])
@@ -103,27 +108,35 @@ if __name__ == '__main__':
                     p = R.dot(p) + T
                     output_file.write('v %f %f %f\n' % (p[0],p[1],p[2]))
                 elif l.startswith('vt '):
-                    num_texture += 1
+                    num_vt += 1
+                    output_file.write(l)
+                elif l.startswith('vn '):
+                    num_vn += 1
                     output_file.write(l)
                 elif l.startswith('f '):
                     s = 'f'
                     for p in l[2:].split():
+                        s += ' '
                         if '/' in p:
-                            vid = int(p.split('/')[0])
-                            try:
-                                vtid = int(p.split('/')[1])
-                                s += ' '+str(vid+offset_vertex)+'/'+str(vtid+offset_texture)
-                            except:
-                                vtid = int(p.split('/')[2])
-                                s += ' '+str(vid+offset_vertex)+'//'+str(vtid+offset_texture)
+                            # face statement is 'f v/vt/vn v/vt/vn v/vt/vn'
+                            vid_s, vtid_s, vnid_s = p.split('/')
+                            s += str(int(vid_s) + offset_vertex)
+                            s += '/'
+                            if vtid_s:  # If there is a vertex texture
+                                s += str(int(vtid_s) + offset_texture)
+                            s += '/'
+                            if vnid_s:  # If there is a vertex normal
+                                s += str(int(vnid_s) + offset_normals)
                         else:
-                            s +=' ' + str(int(p)+offset_vertex)
+                            s += str(int(p)+offset_vertex)
                     output_file.write(s+'\n')
                 elif l.startswith('mtllib '):
-                    pass
+                    mtl_file_name = l[len('mtllib '):]
+                    output_file.write('mtllib ' + os.path.join(os.path.dirname(shapenet_model_path), mtl_file_name))
                 else:
                     output_file.write(l)
-            offset_vertex += num_vertices
-            offset_texture += num_texture
+            offset_vertex += num_v
+            offset_texture += num_vt
+            offset_normals += num_vn
             shapenet_file.close()
     output_file.close()
