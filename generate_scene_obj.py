@@ -9,9 +9,15 @@ import random
 
 import argparse
 
+datasets = ["val", "train"]
+
 parser = argparse.ArgumentParser(description='Reads in scene from protobuf and output a complete .obj and .mtl file')
 parser.add_argument('--materials', action='store_true')
-parser.add_argument('data_dir')
+parser.add_argument('--shapenet-dir')
+parser.add_argument('--layout-dir')
+parser.add_argument('--ids', help="The indices of the trajectories to choose, comma separated,"
+                                  "if empty, then all trajectories are processed")
+parser.add_argument('protobuf')
 
 
 def get_bounding_box(shapenet_path):
@@ -112,7 +118,7 @@ def merge_scenenet_obj(output_obj_file, shapenet_dir, instance, k, offsets):
                     s += '/'
                     if vtid_s:  # If there is a vertex texture
                         s += str(int(vtid_s) + offset_vt)
-                        s += '/'
+                    s += '/'
                     if vnid_s:  # If there is a vertex normal
                         s += str(int(vnid_s) + offset_vn)
                 else:
@@ -141,23 +147,14 @@ def merge_scenenet_mtl(output_mtl_file, shapenet_dir, instance, k):
             output_mtl_file.write(l)
 
 
-def main(data_root_path, protobuf_path, shapenet_dir, layout_dir):
-    trajectories = sn.Trajectories()
-    try:
-        with open(protobuf_path, 'rb') as f:
-            trajectories.ParseFromString(f.read())
-    except IOError:
-        print('Scenenet protobuf data not found at location:{0}'.format(data_root_path))
-        print('Please ensure you have copied the pb file to the data directory')
-        raise
-
-    traj = trajectories.trajectories[4]  # random.choice(trajectories.trajectories)
+def convert_trajectory(i, traj, shapenet_dir, layout_dir):
+    out_name = "trajectory_%d" % i
 
     layout_path = traj.layout.model
     layout_file = open(os.path.join(layout_dir, layout_path), 'r')
 
-    output_obj_filename = 'complete_scene.obj'
-    output_mtl_filename = 'complete_scene.mtl'
+    output_obj_filename = out_name + '.obj'
+    output_mtl_filename = out_name + '.mtl'
     output_obj_file = open(output_obj_filename, 'w')
 
     output_mtl_file = None
@@ -187,7 +184,7 @@ def main(data_root_path, protobuf_path, shapenet_dir, layout_dir):
 
     offsets = [offset_v, offset_vt, offset_vn]
 
-    # TODO: Read in layout mtl file, and assign random texture
+    # TODO: Read in the layout mtl file, and assign random texture
     # While the mtl files from the layout obj are re-used,
     # We combine all other mtl files form the meshes into one.
     for k, instance in enumerate(traj.instances):
@@ -202,17 +199,36 @@ def main(data_root_path, protobuf_path, shapenet_dir, layout_dir):
         output_mtl_file.close()
 
 
+def main(protobuf_path, shapenet_dir, layout_dir, indices):
+    trajectories_pb = sn.Trajectories()
+    try:
+        with open(protobuf_path, 'rb') as f:
+            trajectories_pb.ParseFromString(f.read())
+    except IOError:
+        print('Scenenet protobuf data not found at location:{0}'.format(protobuf_path))
+        raise
+
+    trajectories = trajectories_pb.trajectories
+
+    if indices:
+        trajectories = [trajectories[i] for i in indices]
+
+    for i, traj in enumerate(trajectories):
+        convert_trajectory(i, traj, shapenet_dir, layout_dir)
+
+
 if __name__ == '__main__':
     args = parser.parse_args()
 
-    data_dir = args.data_dir
+    ids = [int(i) for i in args.ids.split(",")]
+    data_dir = os.path.dirname(args.protobuf)
 
     # The usual ScenenetRGBD paths
     main(
-        data_root_path=os.path.join(data_dir, 'val'),
-        protobuf_path=os.path.join(data_dir, 'scenenet_rgbd_val.pb'),
+        protobuf_path=args.protobuf,
         # Sign up and download the ShapeNetCore.v1 dataset (https://www.shapenet.org/) extract to the path below
-        shapenet_dir=os.path.join(data_dir, 'ShapeNetCore.v2'),
+        shapenet_dir=args.shapenet_dir or os.path.join(data_dir, 'ShapeNetCore.v2'),
         # Clone the layouts for our dataset (https://github.com/jmccormac/SceneNetRGBD_Layouts.git) to the path below
-        layout_dir=os.path.join(data_dir, 'SceneNetRGBD_Layouts'))
+        layout_dir=args.layout_dir or os.path.join(data_dir, 'SceneNetRGBD_Layouts'),
+        indices=ids)
 
