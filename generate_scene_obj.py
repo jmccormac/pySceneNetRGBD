@@ -8,23 +8,23 @@ import numpy
 import random
 
 def get_bounding_box(path):
-	shapenet_file = open(path,'r')
-	vertices = []
-	for l in shapenet_file:
-		if l.startswith('v '):
-			s = l[2:].split()
-			x = float(s[0])
-			y = float(s[1])
-			z = float(s[2])
-			vertices.append([x,y,z])
-	shapenet_file.close()
-	minX = min([v[0] for v in vertices])
-	maxX = max([v[0] for v in vertices])
-	minY = min([v[1] for v in vertices])
-	maxY = max([v[1] for v in vertices])
-	minZ = min([v[2] for v in vertices])
-	maxZ = max([v[2] for v in vertices])
-	return minX,maxX,minY,maxY,minZ,maxZ
+    shapenet_file = open(path,'r')
+    vertices = []
+    for l in shapenet_file:
+        if l.startswith('v '):
+            s = l[2:].split()
+            x = float(s[0])
+            y = float(s[1])
+            z = float(s[2])
+            vertices.append([x,y,z])
+    shapenet_file.close()
+    minX = min([v[0] for v in vertices])
+    maxX = max([v[0] for v in vertices])
+    minY = min([v[1] for v in vertices])
+    maxY = max([v[1] for v in vertices])
+    minZ = min([v[2] for v in vertices])
+    maxZ = max([v[2] for v in vertices])
+    return minX,maxX,minY,maxY,minZ,maxZ
 
 # The usual ScenenetRGBD paths
 data_root_path = 'data/val'
@@ -112,6 +112,13 @@ if __name__ == '__main__':
                     output_file.write(l)
                 elif l.startswith('vn '):
                     num_vn += 1
+                    #s = l[2:].split()
+                    #x = float(s[0])
+                    #y = float(s[1])
+                    #z = float(s[2])
+                    #n = numpy.array([x, y, z])
+                    #n = R.dot(n)
+                    #output_file.write('vn %f %f %f\n' % (n[0],n[1],n[2]))
                     output_file.write(l)
                 elif l.startswith('f '):
                     s = 'f'
