@@ -13,6 +13,7 @@ datasets = ["val", "train"]
 
 parser = argparse.ArgumentParser(description='Reads in scene from protobuf and output a complete .obj and .mtl file')
 parser.add_argument('--materials', action='store_true')
+parser.add_argument('--v1', action='store_true', help="Models are using ShapeNet v1 repo rather than v2")
 parser.add_argument('--shapenet-dir')
 parser.add_argument('--layout-dir')
 parser.add_argument('--ids', help="The indices of the trajectories to choose, comma separated,"
@@ -41,14 +42,17 @@ def get_bounding_box(shapenet_path):
 
 def load_obj(shapenet_dir, instance, suffix):
     shapenet_id = instance.object_info.shapenet_hash
-    shapenet_obj_path = os.path.join(shapenet_dir, shapenet_id, 'model.' + suffix)
+    # As of v2 preference is given to the model_normalized naming convention
+    shapenet_obj_path = os.path.join(shapenet_dir, shapenet_id, 'models', 'model_normalized.' + suffix)
     if not os.path.isfile(shapenet_obj_path):
-        print('ShapeNet object not found at path:{0} trying secondary location...'.format(shapenet_obj_path))
-        shapenet_obj_path = os.path.join(shapenet_dir, shapenet_id, 'models', 'model_normalized.' + suffix)
+        if not args.v1:
+            print('Cannot find normalized model. Most likely using ShapeNet.v1 - try running script with --v1 flag. Missing object at path:{0} trying secondary location...'.format(shapenet_obj_path))
+        shapenet_obj_path = os.path.join(shapenet_dir, shapenet_id, 'model.' + suffix)
         if not os.path.isfile(shapenet_obj_path):
             print('ShapeNet object not found at path:{0}'.format(shapenet_obj_path))
             sys.exit(1)
-
+    elif args.v1:
+        print('This looks like a ShapeNet.v2 model with the name "model_normalized.obj", consider running without the v1 flag')
     return shapenet_obj_path
 
 
@@ -86,9 +90,10 @@ def merge_scenenet_obj(output_obj_file, shapenet_dir, instance, k, offsets):
             z = float(s[2])
             p = numpy.array([x, y, z])
 
-            tmp = p[0]
-            p[0] = p[2]
-            p[2] = -tmp
+            if args.v1:
+                tmp = p[0]
+                p[0] = p[2]
+                p[2] = -tmp
 
             p = (p - centroid) * (height / (bb[3] - bb[2]))
             p = R.dot(p) + T
@@ -98,22 +103,25 @@ def merge_scenenet_obj(output_obj_file, shapenet_dir, instance, k, offsets):
             output_obj_file.write(l)
         elif l.startswith('vn '):
             num_vn += 1
-            # TODO: Check if rotation is needed
-            # s = l[2:].split()
-            # x = float(s[0])
-            # y = float(s[1])
-            # z = float(s[2])
-            # n = numpy.array([x, y, z])
-            # n = R.dot(n)
-            # merge_into_file.write('vn %f %f %f\n' % (n[0],n[1],n[2]))
-            output_obj_file.write(l)
+            s = l[2:].split()
+            x = float(s[0])
+            y = float(s[1])
+            z = float(s[2])
+            n = numpy.array([x, y, z])
+            n = R.dot(n)
+            output_obj_file.write('vn %f %f %f\n' % (n[0],n[1],n[2]))
         elif l.startswith('f '):
             s = 'f'
             for p in l[2:].split():
                 s += ' '
                 if '/' in p:
                     # face statement is 'f v/vt/vn v/vt/vn v/vt/vn'
-                    vid_s, vtid_s, vnid_s = p.split('/')
+                    try:
+                        vid_s, vtid_s, vnid_s = p.split('/')
+                    except ValueError:
+                        # This is for compatibility with some v1 object models
+                        vid_s, vtid_s = p.split('/')
+                        vnid_s = None
                     s += str(int(vid_s) + offset_v)
                     s += '/'
                     if vtid_s:  # If there is a vertex texture
@@ -215,6 +223,7 @@ def main(protobuf_path, shapenet_dir, layout_dir, indices):
 
     for i, traj in enumerate(trajectories):
         convert_trajectory(i, traj, shapenet_dir, layout_dir)
+    print('Scene Generation Complete')
 
 
 if __name__ == '__main__':
@@ -231,4 +240,3 @@ if __name__ == '__main__':
         # Clone the layouts for our dataset (https://github.com/jmccormac/SceneNetRGBD_Layouts.git) to the path below
         layout_dir=args.layout_dir or os.path.join(data_dir, 'SceneNetRGBD_Layouts'),
         indices=ids)
-
