@@ -8,6 +8,7 @@ A set of python3 scripts showing examples of how to navigate and access the core
 * numpy
 * PIL
 * protobuf
+* libcvd: https://github.com/ankurhanda/libcvd
 
 # protobuf installation
 
