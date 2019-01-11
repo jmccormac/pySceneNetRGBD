@@ -219,17 +219,19 @@ def main(protobuf_path, shapenet_dir, layout_dir, indices):
     trajectories = trajectories_pb.trajectories
 
     if indices:
-        trajectories = [trajectories[i] for i in indices]
+        trajectories = [(i,trajectories[i]) for i in indices]
+    else:
+        trajectories = [(i,trajectory) for i,trajectory in enumerate(trajectories)]
 
-    for i, traj in enumerate(trajectories):
-        convert_trajectory(i, traj, shapenet_dir, layout_dir)
+    for index,traj in trajectories:
+        convert_trajectory(index, traj, shapenet_dir, layout_dir)
     print('Scene Generation Complete')
 
 
 if __name__ == '__main__':
     args = parser.parse_args()
 
-    ids = [int(i) for i in args.ids.split(",")]
+    ids = [int(i) for i in args.ids.split(",")] if args.ids else None
     data_dir = os.path.dirname(args.protobuf)
 
     # The usual ScenenetRGBD paths
